@@ -1,4 +1,4 @@
-use std::{fmt::{write, Display}, io::{BufReader, Read}};
+use std::{fmt::Display, io::{BufReader, Read}};
 
 use crc::{Crc, CRC_32_ISO_HDLC};
 
@@ -31,6 +31,20 @@ impl Chunk {
 
     fn chunk_type(&self) -> &ChunkType {
         &self.chunk_type
+    }
+
+    fn data_as_string(&self) -> String {
+        String::from_utf8(self.chunk_data.clone()).unwrap()
+    }
+
+    fn crc(&self) -> u32 {
+        self.crc
+    }
+
+    fn as_bytes(&self) -> Vec<u8> {
+        let bytes = self.chunk_type.chunk_type.clone()
+            .into_iter().chain(self.chunk_data.clone()).collect();
+        bytes
     }
 }
 
