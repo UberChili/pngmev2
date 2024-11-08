@@ -110,7 +110,6 @@ impl TryFrom<&[u8]> for Chunk {
 
         // Calculate crc over entire chunk
         let mut crc_data = Vec::with_capacity(8 + data.len());
-        crc_data.extend_from_slice(&data_length.to_be_bytes());
         crc_data.extend_from_slice(&chunk_type);
         crc_data.extend_from_slice(&data);
 
