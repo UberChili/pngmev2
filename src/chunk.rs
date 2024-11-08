@@ -7,7 +7,7 @@ use crc::{Crc, CRC_32_ISO_HDLC};
 
 use crate::chunk_type::ChunkType;
 
-struct Chunk {
+pub struct Chunk {
     length: u32,
     chunk_type: ChunkType,
     chunk_data: Vec<u8>,
@@ -16,7 +16,7 @@ struct Chunk {
 
 #[allow(dead_code)]
 impl Chunk {
-    fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
+    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
         let length: u32 = data.len().try_into().unwrap();
         let crc_bytes: Vec<u8> = chunk_type
             .chunk_type
