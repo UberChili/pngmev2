@@ -62,15 +62,12 @@ impl FromStr for ChunkType {
     type Err = Box<dyn Error>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s.len() != 4 {
-            return Err("String has invalid length (less than 4)".into());
-        }
         let mut result: Vec<u8> = Vec::new();
         for c in s.chars() {
-            if !c.is_ascii_alphabetic() {
-                return Err("Character {c} is not alphanumeric".into());
-            } else {
+            if c.is_ascii_alphabetic() {
                 result.push(c as u8);
+            } else {
+                return Err("Character {c} is not alphanumeric".into());
             }
         }
         Ok(Self { chunk_type: result })

@@ -26,11 +26,7 @@ impl Chunk {
             .collect();
         let crc = Crc::<u32>::new(&CRC_32_ISO_HDLC);
         let calculated_crc = crc.checksum(&crc_bytes);
-        let provided_crc = u32::from_be_bytes(crc_bytes.try_into().unwrap());
 
-        if calculated_crc != provided_crc {
-            panic!("CRC mismatch when creating by ::new");
-        }
         Self {
             length,
             chunk_type,
@@ -47,8 +43,8 @@ impl Chunk {
         &self.chunk_type
     }
 
-    fn data_as_string(&self) -> String {
-        String::from_utf8(self.chunk_data.clone()).unwrap()
+    fn data_as_string(&self) -> Result<String, std::str::Utf8Error> {
+        Ok(String::from_utf8(self.chunk_data.clone()).unwrap())
     }
 
     fn crc(&self) -> u32 {
@@ -181,8 +177,7 @@ mod tests {
     #[test]
     fn test_chunk_string() {
         let chunk = testing_chunk();
-        //let chunk_string = chunk.data_as_string().unwrap();
-        let chunk_string = chunk.data_as_string();
+        let chunk_string = chunk.data_as_string().unwrap();
         let expected_chunk_string = String::from("This is where your secret message will be!");
         assert_eq!(chunk_string, expected_chunk_string);
     }
@@ -211,8 +206,7 @@ mod tests {
 
         let chunk = Chunk::try_from(chunk_data.as_ref()).unwrap();
 
-        //let chunk_string = chunk.data_as_string().unwrap();
-        let chunk_string = chunk.data_as_string();
+        let chunk_string = chunk.data_as_string().unwrap();
         let expected_chunk_string = String::from("This is where your secret message will be!");
 
         assert_eq!(chunk.length(), 42);
