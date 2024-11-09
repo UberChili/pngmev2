@@ -5,23 +5,40 @@ pub struct Png {
     chunks: Vec<Chunk>,
 }
 
+impl TryFrom<&[u8]> for Png {
+    type Error = Box<dyn std::error::Error>;
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        todo!()
+    }
+}
+
+#[allow(dead_code)]
 impl Png {
     const STANDARD_HEADER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
 
     fn from_chunks(chunks: Vec<Chunk>) -> Png {
-        Self { header: Self::STANDARD_HEADER, chunks }
+        Self {
+            header: Self::STANDARD_HEADER,
+            chunks,
+        }
     }
 
     fn append_chunk(&mut self, chunk: Chunk) {
-        &self.chunks.push(chunk);
+        self.chunks.push(chunk)
     }
 
-    fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk, Box<dyn std::error::Error>> {
-        if let Some(index) = self.chunks.iter().
-            position(|chunk| chunk.chunk_type().to_string() == chunk_type) {
+    fn remove_first_chunk(
+        &mut self,
+        chunk_type: &str,
+    ) -> Result<Chunk, Box<dyn std::error::Error>> {
+        if let Some(index) = self
+            .chunks
+            .iter()
+            .position(|chunk| chunk.chunk_type().to_string() == chunk_type)
+        {
             Ok(self.chunks.remove(index))
         } else {
-            Err("Chunk not found. Can't remove".into())
+            Err("Chunk of type {chunk_type} not found. Can't remove".into())
         }
     }
 
@@ -34,15 +51,28 @@ impl Png {
     }
 
     fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
-        todo!()
+        match self
+            .chunks
+            .iter()
+            .find(|chunk| chunk.chunk_type().to_string() == chunk_type)
+        {
+            Some(element) => return Some(element),
+            None => {
+                println!("Chunk {} not found.", chunk_type);
+                None
+            }
+        }
     }
 
     fn as_bytes(&self) -> Vec<u8> {
-        todo!()
+        let mut bytes: Vec<u8> = self.header.to_vec();
+        self.chunks.iter().for_each(|chunk| {
+            bytes.extend(chunk.as_bytes());
+        });
+        bytes
     }
 }
 
-#![allow(unused_variables)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -64,7 +94,10 @@ mod tests {
         Png::from_chunks(chunks)
     }
 
-    fn chunk_from_strings(chunk_type: &str, data: &str) -> Result<Chunk> {
+    fn chunk_from_strings(
+        chunk_type: &str,
+        data: &str,
+    ) -> Result<Chunk, Box<dyn std::error::Error>> {
         use std::str::FromStr;
 
         let chunk_type = ChunkType::from_str(chunk_type)?;
