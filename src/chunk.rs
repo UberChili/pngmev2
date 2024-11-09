@@ -35,23 +35,23 @@ impl Chunk {
         }
     }
 
-    fn length(&self) -> u32 {
+    pub fn length(&self) -> u32 {
         self.length
     }
 
-    fn chunk_type(&self) -> &ChunkType {
+    pub fn chunk_type(&self) -> &ChunkType {
         &self.chunk_type
     }
 
-    fn data_as_string(&self) -> Result<String, std::str::Utf8Error> {
+    pub fn data_as_string(&self) -> Result<String, std::str::Utf8Error> {
         Ok(String::from_utf8(self.chunk_data.clone()).unwrap())
     }
 
-    fn crc(&self) -> u32 {
+    pub fn crc(&self) -> u32 {
         self.crc
     }
 
-    fn as_bytes(&self) -> Vec<u8> {
+    pub fn as_bytes(&self) -> Vec<u8> {
         let bytes = self
             .chunk_type
             .chunk_type

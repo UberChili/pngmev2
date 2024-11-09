@@ -13,19 +13,24 @@ impl Png {
     }
 
     fn append_chunk(&mut self, chunk: Chunk) {
-        todo!()
+        &self.chunks.push(chunk);
     }
 
-    fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk> {
-        todo!()
+    fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk, Box<dyn std::error::Error>> {
+        if let Some(index) = self.chunks.iter().
+            position(|chunk| chunk.chunk_type().to_string() == chunk_type) {
+            Ok(self.chunks.remove(index))
+        } else {
+            Err("Chunk not found. Can't remove".into())
+        }
     }
 
     fn header(&self) -> &[u8; 8] {
-        todo!()
+        &self.header
     }
 
     fn chunks(&self) -> &[Chunk] {
-        todo!()
+        &self.chunks
     }
 
     fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
