@@ -1,7 +1,40 @@
 use crate::chunk::Chunk;
 
 pub struct Png {
+    header: [u8; 8],
     chunks: Vec<Chunk>,
+}
+
+impl Png {
+    const STANDARD_HEADER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
+
+    fn from_chunks(chunks: Vec<Chunk>) -> Png {
+        Self { header: Self::STANDARD_HEADER, chunks }
+    }
+
+    fn append_chunk(&mut self, chunk: Chunk) {
+        todo!()
+    }
+
+    fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk> {
+        todo!()
+    }
+
+    fn header(&self) -> &[u8; 8] {
+        todo!()
+    }
+
+    fn chunks(&self) -> &[Chunk] {
+        todo!()
+    }
+
+    fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
+        todo!()
+    }
+
+    fn as_bytes(&self) -> Vec<u8> {
+        todo!()
+    }
 }
 
 #![allow(unused_variables)]
