@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::chunk::Chunk;
 
 pub struct Png {
@@ -7,8 +9,68 @@ pub struct Png {
 
 impl TryFrom<&[u8]> for Png {
     type Error = Box<dyn std::error::Error>;
+
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        todo!()
+        // Check if slice has at least enough elements to form the header of the file
+        if value.len() < 8 {
+            return Err("Invalid chunks. Can't be zero".into());
+        } else {
+            let header: &[u8] = &value[0..8];
+            // Check if header corresponds to the correct standard header
+            if header != Png::STANDARD_HEADER {
+                return Err("Invalid header. Can't form PNG".into());
+            } else {
+                let mut formed_chunks: Vec<Chunk> = Vec::new();
+                //let remainder: &[u8] = &value[8..];
+
+                let mut current_position = 8;
+                while current_position < value.len() {
+                    if value.len() - current_position < 4 {
+                        return Err("Incomplete chunk length. Therefore can't form chunk".into());
+                    }
+
+                    // Get length
+                    let length_bytes = value[current_position..current_position + 4]
+                        .try_into()
+                        .map_err(|_| "Failed to extract chunk length")?;
+                    let length = u32::from_be_bytes(length_bytes) as usize;
+
+                    // Ensure there's enough bytes for the chunk (length + some additional fields)
+                    let chunk_size = 4 + 4 + length + 4;
+                    if value.len() - current_position < chunk_size {
+                        return Err("Not enough bytes to form a valid chunk".into());
+                    } else {
+                        let chunk_bytes = &value[current_position..current_position + chunk_size];
+
+                        let chunk = Chunk::try_from(chunk_bytes)?;
+                        formed_chunks.push(chunk);
+
+                        // advance position
+                        current_position += chunk_size;
+                    }
+                }
+                Ok(Self {
+                    header: header
+                        .try_into()
+                        .map_err(|_| "Error creating final header")?,
+                    chunks: formed_chunks,
+                })
+            }
+        }
+    }
+}
+
+impl Display for Png {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "PNG {{")?;
+        write!(f, "Header: ")?;
+        for byte in self.header() {
+            write!(f, "{:02X} ", byte)?;
+        }
+        writeln!(f)?;
+        // Optionally, print chunk information here as well
+        writeln!(f, "  Number of chunks: {}", self.chunks.len())?;
+        writeln!(f, "}}")
     }
 }
 
