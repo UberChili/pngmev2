@@ -38,7 +38,12 @@ impl TryFrom<&[u8]> for Png {
         loop {
             // Get length
             let mut length_buff: [u8; 4] = [0; 4];
-            reader.read_exact(&mut length_buff)?;
+            match reader.read_exact(&mut length_buff) {
+                Ok(_) => (),
+                Err(_) => {
+                    break;
+                }
+            }
             let data_length = u32::from_be_bytes(length_buff);
 
             // Calculate total chunk size: length(4) + type(4) + data + crc(4)
@@ -56,18 +61,10 @@ impl TryFrom<&[u8]> for Png {
             // call try_from from Chunk and try to form a Chunk
             match Chunk::try_from(complete_chunk.as_slice()) {
                 Ok(chunk) => {
-                    // println!("Chunk {} read.", chunk.chunk_type());
-                    // chunks.push(chunk);
-                    if chunk.chunk_type().to_string() == "IEND" {
-                        chunks.push(chunk);
-                        break;
-                    } else {
-                        chunks.push(chunk);
-                    }
+                    chunks.push(chunk);
                 }
                 Err(err) => {
-                    eprintln!("Error reading Chunk: {}", err);
-                    break;
+                    return Err(format!("Error reading Chunk: {}.", err).into());
                 }
             }
         }
