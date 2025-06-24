@@ -1,6 +1,6 @@
 use std::{
     fmt::Display,
-    io::{BufReader, Read},
+    io::{Cursor, Read},
 };
 
 use crate::chunk::Chunk;
@@ -24,7 +24,8 @@ impl TryFrom<&[u8]> for Png {
         }
 
         // Creating a reader to read all the bytes
-        let mut reader = BufReader::new(value);
+        // let mut reader = BufReader::new(value);
+        let mut reader = Cursor::new(value);
 
         // Getting Signature Header and comparing to see if it's valid
         let mut signature_header: [u8; 8] = [0; 8];
