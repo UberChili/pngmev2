@@ -19,7 +19,6 @@ fn main() -> Result<()> {
             chunk,
             message,
         } => {
-            // println!("Got: {}, {}, {}", filepath, chunk, message)
             commands::encode(&filepath, &chunk, &message)?;
         }
         Commands::Decode { filepath, chunk } => {
