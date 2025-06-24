@@ -57,11 +57,24 @@ impl TryFrom<&[u8]> for Png {
             match Chunk::try_from(complete_chunk.as_slice()) {
                 Ok(chunk) => {
                     // println!("Chunk {} read.", chunk.chunk_type());
-                    chunks.push(chunk);
+                    // chunks.push(chunk);
+                    if chunk.chunk_type().to_string() == "IEND" {
+                        chunks.push(chunk);
+                        break;
+                    } else {
+                        chunks.push(chunk);
+                    }
                 }
-                Err(err) => eprintln!("Error reading Chunk: {}", err),
+                Err(err) => {
+                    eprintln!("Error reading Chunk: {}", err);
+                    break;
+                }
             }
         }
+        Ok(Png {
+            signature_header,
+            chunks,
+        })
     }
 }
 
@@ -127,11 +140,9 @@ impl Png {
     }
 
     pub fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
-        let chunk = self
-            .chunks
+        self.chunks
             .iter()
-            .find(|c| c.chunk_type().to_string() == chunk_type);
-        Some(chunk)?
+            .find(|c| c.chunk_type().to_string() == chunk_type)
     }
 
     pub fn as_bytes(&self) -> Vec<u8> {
