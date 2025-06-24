@@ -1,4 +1,4 @@
-#+title: Readme
+#+title: Pngme
 
 Encode and decode hidden messages in PNG files.
 
