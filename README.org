@@ -17,7 +17,7 @@ Then you can run the exacutable via:
 
 Or you can install globally so you can run it from anywhere:
 #+begin_src sh
-cargo install --path
+cargo install --path .
 #+end_src
 
 * Background
